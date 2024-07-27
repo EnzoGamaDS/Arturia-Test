@@ -2,138 +2,81 @@
 
 namespace App\Controllers;
 
-use App\Models\PedidoProdutoModel;
-use App\Models\ProdutoModel;
 use CodeIgniter\RESTful\ResourceController;
+use Config\Services;
 
 class PedidoController extends ResourceController
 {
-    protected $modelName = 'App\Models\PedidoModel';
-    protected $format = 'json';
+    protected $service;
+
+    public function __construct()
+    {
+        $this->service = Services::pedidoService();
+    }
 
     public function index()
     {
-        $pedidos = $this->model->findAll();
-        $pedidoProdutoModel = new PedidoProdutoModel();
-        $produtoModel = new ProdutoModel();
-
-        foreach ($pedidos as &$pedido) {
-            $pedidoProdutos = $pedidoProdutoModel->where('pedido_id', $pedido['id'])->findAll();
-            foreach ($pedidoProdutos as &$pedidoProduto) {
-                $produto = $produtoModel->find($pedidoProduto['produto_id']);
-                $pedidoProduto['produto'] = $produto;
-            }
-            $pedido['produtos'] = $pedidoProdutos;
+        try {
+            $pedidos = $this->service->getAll();
+            return $this->respond($pedidos);
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
         }
-
-        return $this->respond($pedidos);
     }
 
     public function show($id = null)
     {
-        $data = $this->model->find($id);
-        if ($data) {
-            $pedidoProdutoModel = new PedidoProdutoModel();
-            $produtoModel = new ProdutoModel();
-
-            $pedidoProdutos = $pedidoProdutoModel->where('pedido_id', $id)->findAll();
-            foreach ($pedidoProdutos as &$pedidoProduto) {
-                $produto = $produtoModel->find($pedidoProduto['produto_id']);
-                $pedidoProduto['produto'] = $produto;
+        try {
+            $pedido = $this->service->getById($id);
+            if ($pedido) {
+                return $this->respond($pedido);
+            } else {
+                return $this->failNotFound('Pedido não encontrado.');
             }
-            $data['produtos'] = $pedidoProdutos;
-
-            return $this->respond($data);
-        } else {
-            return $this->failNotFound('Pedido não encontrado.');
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
         }
     }
 
     public function create()
     {
-        $db = \Config\Database::connect();
-        $data = $this->request->getJSON(true);
-
-        if (!isset($data['produtos']) || !is_array($data['produtos'])) {
-            return $this->failValidationError('Dados de produtos inválidos.');
-        }
-
-        $db->transStart();
-
         try {
-            $pedidoData = [
-                'usuario_id' => 1,
-                'status' => 'comprado'
-            ];
-            if (!$this->model->insert($pedidoData)) {
-                throw new \Exception('Erro ao criar o pedido.');
-            }
-            $pedidoId = $this->model->getInsertID();
-
-            $pedidoProdutoModel = new PedidoProdutoModel();
-
-            foreach ($data['produtos'] as $produto) {
-                $pedidoProdutoData = [
-                    'pedido_id' => $pedidoId,
-                    'produto_id' => $produto['id'],
-                    'quantidade' => $produto['quantidade']
-                ];
-
-                if (!$pedidoProdutoModel->insert($pedidoProdutoData)) {
-                    throw new \Exception('Erro ao adicionar produto ao pedido: ' . json_encode($pedidoProdutoModel->errors()));
-                }
-            }
-
-            $db->transComplete();
-
-            if ($db->transStatus() === false) {
-                throw new \Exception('Erro na transação do banco de dados.');
-            }
-
-            return $this->respondCreated(['pedido_id' => $pedidoId, 'message' => 'Pedido criado com sucesso.']);
+            $data = $this->request->getJSON(true);
+            $pedido = $this->service->create($data);
+            return $this->respondCreated($pedido);
         } catch (\Exception $e) {
-            $db->transRollback();
-            log_message('error', 'Erro ao processar pedido: ' . $e->getMessage());
-            return $this->fail('Erro ao processar pedido: ' . $e->getMessage());
+            return $this->failValidationError($e->getMessage());
         }
     }
 
     public function update($id = null)
     {
-        $data = $this->request->getRawInput();
-        if ($this->model->update($id, $data)) {
-            return $this->respond($data);
-        } else {
-            return $this->failValidationError($this->model->errors());
+        try {
+            $data = $this->request->getRawInput();
+            $pedido = $this->service->update($id, $data);
+            return $this->respond($pedido);
+        } catch (\Exception $e) {
+            return $this->failValidationError($e->getMessage());
         }
     }
 
     public function delete($id = null)
     {
-        if ($this->model->delete($id)) {
+        try {
+            $this->service->delete($id);
             return $this->respondDeleted(['id' => $id]);
-        } else {
-            return $this->failNotFound('Pedido não encontrado.');
+        } catch (\Exception $e) {
+            return $this->failNotFound($e->getMessage());
         }
     }
 
     public function cancel($id = null)
     {
-        $pedidoProdutoModel = new PedidoProdutoModel();
-
         try {
-            if (!$pedidoProdutoModel->where('pedido_id', $id)->delete()) {
-                throw new \Exception('Erro ao deletar produtos do pedido.');
-            }
-
-            if (!$this->model->delete($id)) {
-                throw new \Exception('Erro ao deletar o pedido.');
-            }
-
-            return $this->respondDeleted(['id' => $id, 'message' => 'Pedido cancelado com sucesso.']);
+            $result = $this->service->cancel($id);
+            return $this->respondDeleted($result);
         } catch (\Exception $e) {
-            log_message('error', 'Erro ao cancelar pedido: ' . $e->getMessage());
-            return $this->fail('Erro ao cancelar pedido: ' . $e->getMessage());
+            return $this->fail($e->getMessage());
         }
     }
 }
