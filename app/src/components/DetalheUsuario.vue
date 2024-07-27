@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <h1>Detalhe do Usuário</h1>
-    <div v-if="usuario">
-      <p>Nome: {{ usuario.nome }}</p>
-      <p>Email: {{ usuario.email }}</p>
-      <router-link to="/usuarios">Voltar para a lista de usuários</router-link>
-    </div>
+  <div class="my-8">
+    <h2 class="text-2xl font-bold mb-4 text-gray-800">Detalhes do Usuário</h2>
+    <p class="mb-2"><strong>Nome:</strong> {{ usuario.nome }}</p>
+    <p class="mb-4"><strong>Email:</strong> {{ usuario.email }}</p>
+    <router-link to="/usuarios" class="text-blue-600 hover:underline">Voltar para a Lista de Usuários</router-link>
   </div>
 </template>
 
@@ -15,11 +13,11 @@ import { getUsuario } from '../api';
 export default {
   data() {
     return {
-      usuario: null,
+      usuario: {},
     };
   },
   async created() {
-    const id = this.$route.params.id;
+    const { id } = this.$route.params;
     this.usuario = await getUsuario(id);
   },
 };

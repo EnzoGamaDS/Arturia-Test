@@ -1,14 +1,11 @@
 <template>
   <div>
-    <h1>Detalhe do Pedido</h1>
+    <h2 class="text-2xl font-bold mb-4">Detalhes do Pedido</h2>
     <div v-if="pedido">
-      <p>ID: {{ pedido.id }}</p>
-      <p>Usuário ID: {{ pedido.usuario_id }}</p>
-      <p>Produto ID: {{ pedido.produto_id }}</p>
-      <p>Quantidade: {{ pedido.quantidade }}</p>
-      <p>Status: {{ pedido.status }}</p>
-      <router-link to="/pedidos">Voltar para a lista de pedidos</router-link>
+      <p><strong>Nome:</strong> {{ pedido.nome }}</p>
+      <p><strong>Status:</strong> {{ pedido.status }}</p>
     </div>
+    <router-link to="/pedidos" class="text-facebook hover:underline">Voltar para a Lista de Pedidos</router-link>
   </div>
 </template>
 
@@ -22,8 +19,14 @@ export default {
     };
   },
   async created() {
-    const id = this.$route.params.id;
+    const { id } = this.$route.params;
     this.pedido = await getPedido(id);
   },
 };
 </script>
+
+<style scoped>
+p {
+  margin-bottom: 1rem;
+}
+</style>

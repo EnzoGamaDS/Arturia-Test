@@ -44,6 +44,21 @@ Options -Indexes
 	ErrorDocument 404 index.php
 </IfModule>
 
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE, PATCH"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    Header always set Access-Control-Allow-Credentials "true"
+
+    # Handle preflight requests
+    SetEnvIfNoCase Request_Method OPTIONS OPTIONS_REQUEST
+    Header always set Access-Control-Allow-Origin "*" env=OPTIONS_REQUEST
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE, PATCH" env=OPTIONS_REQUEST
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With" env=OPTIONS_REQUEST
+    Header always set Access-Control-Max-Age "86400" env=OPTIONS_REQUEST
+</IfModule>
+
+
 # Disable server signature start
 ServerSignature Off
 # Disable server signature end

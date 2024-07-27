@@ -91,3 +91,5 @@ export const finalizarPedido = async (id) => {
   const response = await api.put(`/pedidos/finalizar/${id}`);
   return response.data;
 };
+
+export default api;

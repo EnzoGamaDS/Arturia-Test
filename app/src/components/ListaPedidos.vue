@@ -1,18 +1,28 @@
 <template>
   <div>
-    <h1>Lista de Pedidos</h1>
-    <form @submit.prevent="addPedido">
-      <input v-model="novoPedido.usuario_id" placeholder="ID do Usuário" />
-      <input v-model="novoPedido.produto_id" placeholder="ID do Produto" />
-      <input v-model="novoPedido.quantidade" placeholder="Quantidade" />
-      <input v-model="novoPedido.status" placeholder="Status" />
-      <button type="submit">Adicionar Pedido</button>
+    <h2 class="text-2xl font-bold mb-4">Lista de Pedidos</h2>
+    <form @submit.prevent="addPedido" class="flex flex-col space-y-4 mb-6">
+      <input v-model="novoPedido.nome" placeholder="Nome do Pedido" class="p-2 border border-gray-300 rounded" />
+      <button type="submit" class="bg-facebook text-white p-2 rounded">Adicionar Pedido</button>
     </form>
-    <ul>
-      <li v-for="pedido in pedidos" :key="pedido.id">
-        <router-link :to="`/pedidos/${pedido.id}`">{{ pedido.id }}</router-link>
-      </li>
-    </ul>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="py-2 px-4">Nome</th>
+            <th class="py-2 px-4">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="pedido in pedidos" :key="pedido.id" class="border-b">
+            <td class="py-2 px-4">
+              <router-link :to="`/pedidos/${pedido.id}`" class="text-facebook hover:underline">{{ pedido.nome }}</router-link>
+            </td>
+            <td class="py-2 px-4">{{ pedido.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -24,10 +34,7 @@ export default {
     return {
       pedidos: [],
       novoPedido: {
-        usuario_id: '',
-        produto_id: '',
-        quantidade: '',
-        status: '',
+        nome: '',
       },
     };
   },
@@ -36,12 +43,13 @@ export default {
   },
   methods: {
     async addPedido() {
-      await createPedido(this.novoPedido);
-      this.pedidos = await getPedidos();
-      this.novoPedido.usuario_id = '';
-      this.novoPedido.produto_id = '';
-      this.novoPedido.quantidade = '';
-      this.novoPedido.status = '';
+      try {
+        await createPedido(this.novoPedido);
+        this.pedidos = await getPedidos();
+        this.novoPedido.nome = '';
+      } catch (error) {
+        console.error('Erro ao adicionar pedido:', error);
+      }
     },
   },
 };

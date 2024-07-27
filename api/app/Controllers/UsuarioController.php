@@ -25,8 +25,9 @@ class UsuarioController extends ResourceController
     }
 
     public function create()
-    {
+    {   
         $data = $this->request->getJSON(true);
+
         if ($this->model->insert($data)) {
             return $this->respondCreated($data);
         } else {
