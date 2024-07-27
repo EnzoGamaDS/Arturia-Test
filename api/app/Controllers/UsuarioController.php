@@ -3,54 +3,71 @@
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
+use App\Services\UsuarioService;
+use Config\Services;
 
 class UsuarioController extends ResourceController
 {
-    protected $modelName = 'App\Models\UsuarioModel';
-    protected $format = 'json';
+    protected $service;
+
+    public function __construct()
+    {
+        $this->service = Services::usuarioService();
+    }
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        try {
+            $usuarios = $this->service->getAll();
+            return $this->respond($usuarios);
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
+        }
     }
 
     public function show($id = null)
     {
-        $data = $this->model->find($id);
-        if ($data) {
-            return $this->respond($data);
-        } else {
-            return $this->failNotFound('Usuário não encontrado.');
+        try {
+            $usuario = $this->service->getById($id);
+            if ($usuario) {
+                return $this->respond($usuario);
+            } else {
+                return $this->failNotFound('Usuário não encontrado.');
+            }
+        } catch (\Exception $e) {
+            return $this->failServerError($e->getMessage());
         }
     }
 
     public function create()
-    {   
-        $data = $this->request->getJSON(true);
-
-        if ($this->model->insert($data)) {
-            return $this->respondCreated($data);
-        } else {
-            return $this->failValidationError($this->model->errors());
+    {
+        try {
+            $data = $this->request->getJSON(true);
+            $usuario = $this->service->create($data);
+            return $this->respondCreated($usuario);
+        } catch (\Exception $e) {
+            return $this->failValidationError($e->getMessage());
         }
     }
 
     public function update($id = null)
     {
-        $data = $this->request->getRawInput();
-        if ($this->model->update($id, $data)) {
-            return $this->respond($data);
-        } else {
-            return $this->failValidationError($this->model->errors());
+        try {
+            $data = $this->request->getRawInput();
+            $usuario = $this->service->update($id, $data);
+            return $this->respond($usuario);
+        } catch (\Exception $e) {
+            return $this->failValidationError($e->getMessage());
         }
     }
 
     public function delete($id = null)
     {
-        if ($this->model->delete($id)) {
+        try {
+            $this->service->delete($id);
             return $this->respondDeleted(['id' => $id]);
-        } else {
-            return $this->failNotFound('Usuário não encontrado.');
+        } catch (\Exception $e) {
+            return $this->failNotFound($e->getMessage());
         }
     }
 }
