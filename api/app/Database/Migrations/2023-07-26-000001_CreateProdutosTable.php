@@ -10,19 +10,27 @@ class CreateProdutosTable extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type' => 'INTEGER',
+                'type' => 'INT',
                 'auto_increment' => true
             ],
             'nome' => [
-                'type' => 'TEXT',
+                'type' => 'VARCHAR',
+                'constraint' => 255,
                 'null' => false
             ],
             'peso' => [
-                'type' => 'TEXT',
+                'type' => 'DECIMAL',
+                'constraint' => '10,2',
                 'null' => false
             ],
             'tipo' => [
-                'type' => 'TEXT',
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => false
+            ],
+            'preco' => [
+                'type' => 'DECIMAL',
+                'constraint' => '10,2',
                 'null' => false
             ],
         ]);

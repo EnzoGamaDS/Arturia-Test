@@ -7,26 +7,26 @@ use CodeIgniter\RESTful\ResourceController;
 class ProdutoController extends ResourceController
 {
     protected $modelName = 'App\Models\ProdutoModel';
-    protected $format = 'json';
+    protected $format    = 'json';
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        $produtos = $this->model->findAll();
+        return $this->respond($produtos);
     }
 
     public function show($id = null)
     {
-        $data = $this->model->find($id);
-        if ($data) {
-            return $this->respond($data);
-        } else {
-            return $this->failNotFound('Produto não encontrado.');
+        $produto = $this->model->find($id);
+        if ($produto) {
+            return $this->respond($produto);
         }
+        return $this->failNotFound('Produto não encontrado');
     }
 
     public function create()
     {
-        $data = $this->request->getJSON(true);
+        $data = $this->request->getPost();
         if ($this->model->insert($data)) {
             return $this->respondCreated($data);
         } else {
@@ -47,9 +47,9 @@ class ProdutoController extends ResourceController
     public function delete($id = null)
     {
         if ($this->model->delete($id)) {
-            return $this->respondDeleted(['id' => $id]);
+            return $this->respondDeleted('Produto excluído');
         } else {
-            return $this->failNotFound('Produto não encontrado.');
+            return $this->failNotFound('Produto não encontrado');
         }
     }
 }

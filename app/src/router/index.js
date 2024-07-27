@@ -1,24 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import ListaUsuarios from '../components/ListaUsuarios.vue';
-import DetalheUsuario from '../components/DetalheUsuario.vue';
 import ListaProdutos from '../components/ListaProdutos.vue';
-import DetalheProduto from '../components/DetalheProduto.vue';
+import CarrinhoCompras from '../components/CarrinhoCompras.vue';
 import ListaPedidos from '../components/ListaPedidos.vue';
-import DetalhePedido from '../components/DetalhePedido.vue';
-import HomePage from '../components/HomePage.vue';
+import Home from '../components/Home.vue';
 
 const routes = [
-  { path: '/', name: 'HomePage', component: HomePage },
-  { path: '/usuarios', name: 'ListaUsuarios', component: ListaUsuarios },
-  { path: '/usuarios/:id', name: 'DetalheUsuario', component: DetalheUsuario },
-  { path: '/produtos', name: 'ListaProdutos', component: ListaProdutos },
-  { path: '/produtos/:id', name: 'DetalheProduto', component: DetalheProduto },
-  { path: '/pedidos', name: 'ListaPedidos', component: ListaPedidos },
-  { path: '/pedidos/:id', name: 'DetalhePedido', component: DetalhePedido },
+  { path: '/', component: Home },
+  { path: '/usuarios', component: ListaUsuarios },
+  { path: '/produtos', component: ListaProdutos },
+  { path: '/carrinho', component: CarrinhoCompras },
+  { path: '/pedidos', component: ListaPedidos },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 
