@@ -40,8 +40,9 @@ export default {
     },
     async finalizarPedido() {
       try {
-        await finalizarPedido();
+        const response = await finalizarPedido();
         this.carrinho = [];
+        console.log('Pedido finalizado com sucesso:', response.pedido_id);
       } catch (error) {
         console.error('Erro ao finalizar pedido:', error);
       }

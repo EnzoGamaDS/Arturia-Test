@@ -57,10 +57,10 @@ class Database extends Config
     //     */
     public $default = [
         'DSN'      => '',
-        'hostname' => '',
+        'hostname' => 'localhost',
         'username' => '',
         'password' => '',
-        'database' => WRITEPATH . 'database.db',
+        'database' => WRITEPATH . 'database.sqlite',
         'DBDriver' => 'SQLite3',
         'DBPrefix' => '',
         'pConnect' => false,
@@ -74,6 +74,7 @@ class Database extends Config
         'failover' => [],
         'port'     => 3306,
     ];
+    
 
     //    /**
     //     * Sample database connection for Postgre.

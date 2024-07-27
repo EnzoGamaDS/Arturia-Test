@@ -61,27 +61,6 @@ export const deleteProduto = async (id) => {
   return response.data;
 };
 
-// Carrinho
-export const getCarrinho = async () => {
-  const response = await api.get('/carrinho');
-  return response.data;
-};
-
-export const addCarrinho = async (produto) => {
-  const response = await api.post('/carrinho', produto);
-  return response.data;
-};
-
-export const removeFromCarrinho = async (id) => {
-  const response = await api.delete(`/carrinho/${id}`);
-  return response.data;
-};
-
-export const clearCarrinho = async () => {
-  const response = await api.post('/carrinho/clear');
-  return response.data;
-};
-
 // Pedidos
 export const getPedidos = async () => {
   const response = await api.get('/pedidos');
@@ -108,7 +87,18 @@ export const deletePedido = async (id) => {
   return response.data;
 };
 
-export const finalizarPedido = async () => {
-  const response = await api.post('/carrinho/finalizar');
+export const finalizarPedido = async (id) => {
+  const response = await api.put(`/pedidos/finalizar/${id}`);
+  return response.data;
+};
+
+export const cancelarPedido = async (id) => {
+  const response = await api.put(`/pedidos/cancelar/${id}`);
+  return response.data;
+};
+
+// Carrinho
+export const getCarrinho = async () => {
+  const response = await api.get('/carrinho');
   return response.data;
 };

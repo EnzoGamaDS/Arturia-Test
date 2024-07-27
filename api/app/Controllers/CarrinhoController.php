@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\CarrinhoModel;
+use App\Models\PedidoModel;
+use App\Models\PedidoProdutoModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class CarrinhoController extends ResourceController
@@ -36,11 +38,33 @@ class CarrinhoController extends ResourceController
 
     public function finalizar()
     {
-        $data = $this->model->where('status', 'carrinho')->findAll();
-        foreach ($data as $item) {
-            $item['status'] = 'comprado';
-            $this->model->update($item['id'], $item);
+        $carrinhoModel = new CarrinhoModel();
+        $pedidoModel = new PedidoModel();
+        $pedidoProdutoModel = new PedidoProdutoModel();
+
+        $carrinho = $carrinhoModel->where('status', 'carrinho')->findAll();
+
+        if (empty($carrinho)) {
+            return $this->failNotFound('Carrinho vazio.');
         }
-        return $this->respond(['message' => 'Compra finalizada com sucesso.']);
+
+        $pedidoData = [
+            'usuario_id' => 1,
+            'status' => 'comprado'
+        ];
+        $pedidoId = $pedidoModel->insert($pedidoData);
+        
+        foreach ($carrinho as $item) {
+            $pedidoProdutoData = [
+                'pedido_id' => $pedidoId,
+                'produto_id' => $item['produto_id'],
+                'quantidade' => $item['quantidade']
+            ];
+            $pedidoProdutoModel->insert($pedidoProdutoData);
+            
+            $carrinhoModel->update($item['id'], ['status' => 'comprado']);
+        }
+
+        return $this->respond(['message' => 'Compra finalizada com sucesso.', 'pedido_id' => $pedidoId]);
     }
 }

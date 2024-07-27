@@ -2,21 +2,21 @@
   <div class="min-h-screen flex flex-col">
     <header class="bg-blue-600 text-white py-4 shadow-lg">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-3xl font-semibold">Arturia E-commerce</h1>
+        <router-link to="/" class="text-3xl font-semibold hover:text-gray-300">Arturia E-commerce</router-link>
         <nav class="flex items-center space-x-4">
-          <router-link to="/usuarios" class="flex items-center space-x-2 hover:underline">
+          <router-link to="/usuarios" class="flex items-center space-x-2 text-white hover:text-gray-300">
             <font-awesome-icon icon="user" />
             <span>Usuários</span>
           </router-link>
-          <router-link to="/produtos" class="flex items-center space-x-2 hover:underline">
+          <router-link to="/produtos" class="flex items-center space-x-2 text-white hover:text-gray-300">
             <font-awesome-icon icon="box-open" />
             <span>Produtos</span>
           </router-link>
-          <router-link to="/pedidos" class="flex items-center space-x-2 hover:underline">
+          <router-link to="/pedidos" class="flex items-center space-x-2 text-white hover:text-gray-300">
             <font-awesome-icon icon="clipboard-list" />
             <span>Pedidos</span>
           </router-link>
-          <button @click="toggleCart" class="flex items-center space-x-2 text-white">
+          <button @click="toggleCart" class="flex items-center space-x-2 text-white hover:text-gray-300">
             <font-awesome-icon icon="shopping-cart" />
             <span>Carrinho</span>
           </button>
@@ -40,11 +40,19 @@
             <p>{{ item.peso }} kg</p>
             <p>{{ item.tipo }}</p>
             <p>R$ {{ item.preco }}</p>
+            <div class="flex items-center">
+              <button @click="decreaseQuantity(index)" class="quantity-button">-</button>
+              <span class="mx-2">{{ item.quantidade }}</span>
+              <button @click="increaseQuantity(index)" class="quantity-button">+</button>
+            </div>
           </div>
-          <button @click="removeFromCart(index)" class="text-red-500 hover:text-red-700">Remover</button>
+          <button @click="removeFromCart(index)" class="remove-button">Remover</button>
         </li>
       </ul>
-      <button @click="finalizeOrder" class="bg-blue-600 text-white py-2 px-4 rounded mt-4">
+      <button @click="clearCart" class="clear-cart-button">
+        Limpar Carrinho
+      </button>
+      <button @click="finalizeOrder" class="finalize-order-button">
         Finalizar Pedido
       </button>
     </div>
@@ -52,23 +60,52 @@
 </template>
 
 <script>
+import { createPedido } from './api';
+
 export default {
   name: 'App',
   data() {
     return {
       showCart: false,
-      cart: []
+      cart: JSON.parse(localStorage.getItem('cart')) || []
     };
+  },
+  watch: {
+    cart: {
+      handler(newCart) {
+        localStorage.setItem('cart', JSON.stringify(newCart));
+      },
+      deep: true
+    }
   },
   methods: {
     toggleCart() {
       this.showCart = !this.showCart;
     },
     addToCart(product) {
-      this.cart.push(product);
+      const existingProduct = this.cart.find(item => item.id === product.id);
+      if (existingProduct) {
+        existingProduct.quantidade++;
+      } else {
+        this.cart.push({ ...product, quantidade: 1 });
+      }
+      this.showCart = true;
     },
     removeFromCart(index) {
       this.cart.splice(index, 1);
+    },
+    clearCart() {
+      this.cart = [];
+    },
+    increaseQuantity(index) {
+      this.cart[index].quantidade++;
+    },
+    decreaseQuantity(index) {
+      if (this.cart[index].quantidade > 1) {
+        this.cart[index].quantidade--;
+      } else {
+        this.removeFromCart(index);
+      }
     },
     async finalizeOrder() {
       if (this.cart.length === 0) {
@@ -77,7 +114,7 @@ export default {
       }
 
       try {
-        await this.$http.post('/api/pedidos', { produtos: this.cart });
+        await createPedido({ produtos: this.cart });
         this.cart = [];
         this.showCart = false;
         this.$router.push('/pedidos');
@@ -85,6 +122,10 @@ export default {
         console.error("Erro ao finalizar o pedido:", error);
       }
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    this.showCart = false;
+    next();
   }
 };
 </script>
@@ -117,22 +158,11 @@ export default {
   background-color: #165db1;
 }
 
-@media (min-width: 768px) {
-  .input {
-    max-width: 400px;
-  }
-
-  .button {
-    width: auto;
-  }
-}
-
 nav a {
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  background-color: #fff;
-  color: #000;
+  color: #fff;
   border-radius: 0.25rem;
   font-size: 1rem;
   text-decoration: none;
@@ -140,18 +170,12 @@ nav a {
 }
 
 nav a:hover {
-  background-color: #ddd;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .hero {
   background-color: #1877f2;
   color: white;
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: 1200px;
-  }
 }
 
 .fixed {
@@ -181,5 +205,98 @@ nav a:hover {
 
 .overflow-y-auto {
   overflow-y: auto;
+}
+
+.quantity-button {
+  background-color: #f0f2f5;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.quantity-button:hover {
+  background-color: #e1e4e8;
+}
+
+.remove-button {
+  background-color: #ff4d4f;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: white;
+}
+
+.remove-button:hover {
+  background-color: #d9363e;
+}
+
+.clear-cart-button {
+  background-color: #ff4d4f;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: white;
+  margin-top: 1rem;
+}
+
+.clear-cart-button:hover {
+  background-color: #d9363e;
+}
+
+.finalize-order-button {
+  background-color: #1877f2;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: white;
+  margin-top: 1rem;
+}
+
+.finalize-order-button:hover {
+  background-color: #165db1;
+}
+
+.add-to-cart-button {
+  background-color: #1877f2;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.add-to-cart-button:hover {
+  background-color: #165db1;
+}
+
+.add-to-cart {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-to-cart:hover {
+  background-color: #165db1;
+}
+
+.cart-button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.cart-button:hover {
+  color: rgba(255, 255, 255, 0.7);
 }
 </style>

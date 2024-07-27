@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
+use App\Services\PedidoService;
 
 class PedidoController extends ResourceController
 {
@@ -11,13 +12,36 @@ class PedidoController extends ResourceController
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        $pedidos = $this->model->findAll();
+        $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
+        $produtoModel = new \App\Models\ProdutoModel();
+
+        foreach ($pedidos as &$pedido) {
+            $pedidoProdutos = $pedidoProdutoModel->where('pedido_id', $pedido['id'])->findAll();
+            foreach ($pedidoProdutos as &$pedidoProduto) {
+                $produto = $produtoModel->find($pedidoProduto['produto_id']);
+                $pedidoProduto['produto'] = $produto;
+            }
+            $pedido['produtos'] = $pedidoProdutos;
+        }
+
+        return $this->respond($pedidos);
     }
 
     public function show($id = null)
     {
         $data = $this->model->find($id);
         if ($data) {
+            $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
+            $produtoModel = new \App\Models\ProdutoModel();
+
+            $pedidoProdutos = $pedidoProdutoModel->where('pedido_id', $id)->findAll();
+            foreach ($pedidoProdutos as &$pedidoProduto) {
+                $produto = $produtoModel->find($pedidoProduto['produto_id']);
+                $pedidoProduto['produto'] = $produto;
+            }
+            $data['produtos'] = $pedidoProdutos;
+
             return $this->respond($data);
         } else {
             return $this->failNotFound('Pedido não encontrado.');
@@ -26,11 +50,50 @@ class PedidoController extends ResourceController
 
     public function create()
     {
+        $db = \Config\Database::connect();
         $data = $this->request->getJSON(true);
-        if ($this->model->insert($data)) {
-            return $this->respondCreated($data);
-        } else {
-            return $this->failValidationError($this->model->errors());
+
+        if (!isset($data['produtos']) || !is_array($data['produtos'])) {
+            return $this->failValidationError('Dados de produtos inválidos.');
+        }
+
+        $db->transStart();
+
+        try {
+            $pedidoData = [
+                'usuario_id' => 1,
+                'status' => 'comprado'
+            ];
+            if (!$this->model->insert($pedidoData)) {
+                throw new \Exception('Erro ao criar o pedido.');
+            }
+            $pedidoId = $this->model->getInsertID();
+
+            $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
+
+            foreach ($data['produtos'] as $produto) {
+                $pedidoProdutoData = [
+                    'pedido_id' => $pedidoId,
+                    'produto_id' => $produto['id'],
+                    'quantidade' => $produto['quantidade']
+                ];
+
+                if (!$pedidoProdutoModel->insert($pedidoProdutoData)) {
+                    throw new \Exception('Erro ao adicionar produto ao pedido: ' . json_encode($pedidoProdutoModel->errors()));
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \Exception('Erro na transação do banco de dados.');
+            }
+
+            return $this->respondCreated(['pedido_id' => $pedidoId, 'message' => 'Pedido criado com sucesso.']);
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Erro ao processar pedido: ' . $e->getMessage());
+            return $this->fail('Erro ao processar pedido: ' . $e->getMessage());
         }
     }
 
@@ -50,16 +113,6 @@ class PedidoController extends ResourceController
             return $this->respondDeleted(['id' => $id]);
         } else {
             return $this->failNotFound('Pedido não encontrado.');
-        }
-    }
-
-    public function finalizarCompra($id = null)
-    {
-        $data = ['status' => 'comprado'];
-        if ($this->model->update($id, $data)) {
-            return $this->respond($data);
-        } else {
-            return $this->failValidationError($this->model->errors());
         }
     }
 }

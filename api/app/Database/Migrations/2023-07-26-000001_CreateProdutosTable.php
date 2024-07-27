@@ -9,32 +9,38 @@ class CreateProdutosTable extends Migration
     public function up()
     {
         $this->forge->addField([
-            'id' => [
-                'type' => 'INT',
+            'id'          => [
+                'type'           => 'INT',
+                'unsigned'       => true,
                 'auto_increment' => true
             ],
-            'nome' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => false
+            'nome'        => [
+                'type'           => 'VARCHAR',
+                'constraint'     => '255',
             ],
-            'peso' => [
-                'type' => 'DECIMAL',
-                'constraint' => '10,2',
-                'null' => false
+            'peso'        => [
+                'type'           => 'FLOAT',
             ],
-            'tipo' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => false
+            'tipo'        => [
+                'type'           => 'VARCHAR',
+                'constraint'     => '255',
             ],
-            'preco' => [
-                'type' => 'DECIMAL',
-                'constraint' => '10,2',
-                'null' => false
+            'preco'       => [
+                'type'           => 'DECIMAL',
+                'constraint'     => '10,2',
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
             ],
         ]);
+
         $this->forge->addKey('id', true);
+
         $this->forge->createTable('produtos');
     }
 

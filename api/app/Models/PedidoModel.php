@@ -8,12 +8,10 @@ class PedidoModel extends Model
 {
     protected $table = 'pedidos';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['usuario_id', 'produto_id', 'quantidade', 'status'];
+    protected $allowedFields = ['usuario_id', 'status'];
 
     protected $validationRules = [
         'usuario_id' => 'required|integer',
-        'produto_id' => 'required|integer',
-        'quantidade' => 'required|integer',
         'status' => 'required|in_list[carrinho,comprado]',
     ];
 }

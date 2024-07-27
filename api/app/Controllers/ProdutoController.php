@@ -26,11 +26,26 @@ class ProdutoController extends ResourceController
 
     public function create()
     {
-        $data = $this->request->getPost();
-        if ($this->model->insert($data)) {
-            return $this->respondCreated($data);
+        $data = $this->request->getJSON(true);
+
+        if (isset($data[0]) && is_array($data)) {
+            // Inserir múltiplos produtos
+            $insertedData = [];
+            foreach ($data as $produto) {
+                if ($this->model->insert($produto)) {
+                    $insertedData[] = $produto;
+                } else {
+                    return $this->fail($this->model->errors());
+                }
+            }
+            return $this->respondCreated($insertedData);
         } else {
-            return $this->failValidationError($this->model->errors());
+            // Inserir um único produto
+            if ($this->model->insert($data)) {
+                return $this->respondCreated($data);
+            } else {
+                return $this->fail($this->model->errors());
+            }
         }
     }
 
