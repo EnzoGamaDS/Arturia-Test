@@ -1,23 +1,16 @@
 <template>
-  <div class="container">
-    <h2>Lista de Pedidos</h2>
-    <div v-if="pedidos && pedidos.length">
-      <div v-for="pedido in pedidos" :key="pedido.id" class="pedido">
-        <h3>Pedido Número: {{ pedido.id }}</h3>
-        <ul class="produtos">
-          <li v-for="produto in pedido.produtos" :key="produto.produto.id" class="produto">
-            <strong>Nome:</strong> {{ produto.produto.nome }}<br />
-            <strong>Descrição:</strong> {{ produto.produto.descricao }}<br />
-            <strong>Quantidade:</strong> {{ produto.quantidade }}<br />
-            <strong>Preço:</strong> {{ produto.produto.preco }}<br />
-            <strong>Peso:</strong> {{ produto.produto.peso }} kg<br />
-          </li>
-        </ul>
-        <button @click="cancelarPedido(pedido.id)">Cancelar Pedido</button>
+  <div>
+    <h1 class="text-2xl font-bold mb-4">Lista de Pedidos</h1>
+    <div v-for="pedido in pedidos" :key="pedido.id" class="mb-4 border rounded p-4">
+      <h2 class="text-xl font-semibold">Pedido Número: {{ pedido.id }}</h2>
+      <div v-for="produto in pedido.produtos" :key="produto.id" class="mb-2">
+        <p><strong>Nome:</strong> {{ produto.produto.nome }}</p>
+        <p><strong>Descrição:</strong> {{ produto.produto.descricao }}</p>
+        <p><strong>Quantidade:</strong> {{ produto.quantidade }}</p>
+        <p><strong>Preço:</strong> {{ produto.produto.preco }}</p>
+        <p><strong>Peso:</strong> {{ produto.produto.peso }}</p>
       </div>
-    </div>
-    <div v-else>
-      Nenhum pedido encontrado.
+      <button @click="cancelarPedido(pedido.id)" class="bg-red-500 text-white px-4 py-2 rounded">Cancelar Pedido</button>
     </div>
   </div>
 </template>
@@ -29,77 +22,77 @@ export default {
   data() {
     return {
       pedidos: [],
-      error: null,
     };
   },
   async created() {
-    await this.fetchPedidos();
+    this.pedidos = await getPedidos();
   },
   methods: {
-    async fetchPedidos() {
-      try {
-        const data = await getPedidos();
-        if (data && data.length) {
-          this.pedidos = data;
-        } else {
-          this.error = 'Nenhum pedido encontrado.';
-        }
-      } catch (error) {
-        this.error = 'Erro ao buscar pedidos: ' + error.message;
-        console.error('Erro ao buscar pedidos:', error);
-      }
-    },
     async cancelarPedido(id) {
       try {
         await cancelarPedido(id);
-        this.fetchPedidos();
+        this.pedidos = await getPedidos();
       } catch (error) {
         console.error('Erro ao cancelar pedido:', error);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+<style scoped>
+.border {
+  border-width: 1px;
+  border-color: #ddd;
 }
 
-.pedido {
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  padding: 10px;
-  border-radius: 5px;
+.rounded {
+  border-radius: 0.25rem;
 }
 
-.produtos {
-  list-style-type: none;
-  padding: 0;
+.p-4 {
+  padding: 1rem;
 }
 
-.produto {
-  border-top: 1px solid #eee;
-  padding: 10px 0;
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
-.produto:first-child {
-  border-top: none;
+.text-2xl {
+  font-size: 1.5rem;
 }
 
-button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.font-bold {
+  font-weight: 700;
 }
 
-button:hover {
-  background-color: darkred;
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.bg-red-500 {
+  background-color: #f56565;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.rounded {
+  border-radius: 0.25rem;
 }
 </style>

@@ -93,12 +93,6 @@ export const finalizarPedido = async (id) => {
 };
 
 export const cancelarPedido = async (id) => {
-  const response = await api.put(`/pedidos/cancelar/${id}`);
-  return response.data;
-};
-
-// Carrinho
-export const getCarrinho = async () => {
-  const response = await api.get('/carrinho');
+  const response = await api.put(`/cancelar/${id}`);
   return response.data;
 };

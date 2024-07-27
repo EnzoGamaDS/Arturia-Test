@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
-use App\Services\PedidoService;
 
 class PedidoController extends ResourceController
 {
@@ -113,6 +112,26 @@ class PedidoController extends ResourceController
             return $this->respondDeleted(['id' => $id]);
         } else {
             return $this->failNotFound('Pedido não encontrado.');
+        }
+    }
+
+    public function cancel($id = null)
+    {
+        $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
+
+        try {
+            if (!$pedidoProdutoModel->where('pedido_id', $id)->delete()) {
+                throw new \Exception('Erro ao deletar produtos do pedido.');
+            }
+
+            if (!$this->model->delete($id)) {
+                throw new \Exception('Erro ao deletar o pedido.');
+            }
+
+            return $this->respondDeleted(['id' => $id, 'message' => 'Pedido cancelado com sucesso.']);
+        } catch (\Exception $e) {
+            log_message('error', 'Erro ao cancelar pedido: ' . $e->getMessage());
+            return $this->fail('Erro ao cancelar pedido: ' . $e->getMessage());
         }
     }
 }

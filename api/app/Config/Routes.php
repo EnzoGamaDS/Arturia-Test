@@ -17,7 +17,7 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->resource('carrinho', ['controller' => 'CarrinhoController']);
     $routes->post('carrinho/finalizar', 'CarrinhoController::finalizar');
     
-    $routes->put('pedidos/cancelar/(:num)', 'PedidoController::cancel/$1');
+    $routes->put('cancelar/(:num)', 'PedidoController::cancel/$1');
 
-    $routes->put('pedidos/(:num)', 'PedidoController::update/$1');
+
 });
