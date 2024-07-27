@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
-use App\Services\UsuarioService;
 use Config\Services;
 
 class UsuarioController extends ResourceController

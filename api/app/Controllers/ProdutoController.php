@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
-use App\Services\ProdutoService;
 use Config\Services;
 
 class ProdutoController extends ResourceController

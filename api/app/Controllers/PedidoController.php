@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\PedidoProdutoModel;
+use App\Models\ProdutoModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class PedidoController extends ResourceController
@@ -12,8 +14,8 @@ class PedidoController extends ResourceController
     public function index()
     {
         $pedidos = $this->model->findAll();
-        $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
-        $produtoModel = new \App\Models\ProdutoModel();
+        $pedidoProdutoModel = new PedidoProdutoModel();
+        $produtoModel = new ProdutoModel();
 
         foreach ($pedidos as &$pedido) {
             $pedidoProdutos = $pedidoProdutoModel->where('pedido_id', $pedido['id'])->findAll();
@@ -31,8 +33,8 @@ class PedidoController extends ResourceController
     {
         $data = $this->model->find($id);
         if ($data) {
-            $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
-            $produtoModel = new \App\Models\ProdutoModel();
+            $pedidoProdutoModel = new PedidoProdutoModel();
+            $produtoModel = new ProdutoModel();
 
             $pedidoProdutos = $pedidoProdutoModel->where('pedido_id', $id)->findAll();
             foreach ($pedidoProdutos as &$pedidoProduto) {
@@ -68,7 +70,7 @@ class PedidoController extends ResourceController
             }
             $pedidoId = $this->model->getInsertID();
 
-            $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
+            $pedidoProdutoModel = new PedidoProdutoModel();
 
             foreach ($data['produtos'] as $produto) {
                 $pedidoProdutoData = [
@@ -117,7 +119,7 @@ class PedidoController extends ResourceController
 
     public function cancel($id = null)
     {
-        $pedidoProdutoModel = new \App\Models\PedidoProdutoModel();
+        $pedidoProdutoModel = new PedidoProdutoModel();
 
         try {
             if (!$pedidoProdutoModel->where('pedido_id', $id)->delete()) {
