@@ -29,4 +29,13 @@ export default {
 p {
   margin-bottom: 1rem;
 }
+
+@media (max-width: 768px) {
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  p {
+    margin-bottom: 0.5rem;
+  }
+}
 </style>

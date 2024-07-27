@@ -1,16 +1,22 @@
 <template>
   <div>
     <h1 class="text-2xl font-bold mb-4">Lista de Pedidos</h1>
-    <div v-for="pedido in pedidos" :key="pedido.id" class="mb-4 border rounded p-4">
-      <h2 class="text-xl font-semibold">Pedido Número: {{ pedido.id }}</h2>
-      <div v-for="produto in pedido.produtos" :key="produto.id" class="mb-2">
-        <p><strong>Nome:</strong> {{ produto.produto.nome }}</p>
-        <p><strong>Descrição:</strong> {{ produto.produto.descricao }}</p>
-        <p><strong>Quantidade:</strong> {{ produto.quantidade }}</p>
-        <p><strong>Preço:</strong> {{ produto.produto.preco }}</p>
-        <p><strong>Peso:</strong> {{ produto.produto.peso }}</p>
+    <div v-if="pedidos.length === 0" class="text-center mt-8">
+      <p class="text-xl">Não há pedidos.</p>
+    </div>
+    <div v-else>
+      <div v-for="pedido in pedidos" :key="pedido.id" class="mb-4 border rounded p-4">
+        <h2 class="text-xl font-semibold">Pedido Número: {{ pedido.id }}</h2>
+        <div v-for="produto in pedido.produtos" :key="produto.id" class="mb-2">
+          <p><strong>Nome:</strong> {{ produto.produto.nome }}</p>
+          <p><strong>Descrição:</strong> {{ produto.produto.descricao }}</p>
+          <p><strong>Quantidade:</strong> {{ produto.quantidade }}</p>
+          <p><strong>Preço:</strong> {{ produto.produto.preco }}</p>
+          <p><strong>Peso:</strong> {{ produto.produto.peso }}</p>
+        </div>
+        <p class="text-right font-semibold">Total: R$ {{ calcularTotalPedido(pedido).toFixed(2) }}</p>
+        <button @click="cancelarPedido(pedido.id)" class="bg-red-500 text-white px-4 py-2 rounded">Cancelar Pedido</button>
       </div>
-      <button @click="cancelarPedido(pedido.id)" class="bg-red-500 text-white px-4 py-2 rounded">Cancelar Pedido</button>
     </div>
   </div>
 </template>
@@ -36,7 +42,12 @@ export default {
         console.error('Erro ao cancelar pedido:', error);
       }
     },
-  },
+    calcularTotalPedido(pedido) {
+      return pedido.produtos.reduce((total, produto) => {
+        return total + (produto.produto.preco * produto.quantidade);
+      }, 0);
+    }
+  }
 };
 </script>
 
@@ -94,5 +105,36 @@ export default {
 
 .rounded {
   border-radius: 0.25rem;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .p-4 {
+    padding: 0.5rem;
+  }
+  .px-4 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .py-2 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  .mb-4 {
+    margin-bottom: 0.5rem;
+  }
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+  .text-xl {
+    font-size: 1rem;
+  }
 }
 </style>

@@ -22,3 +22,18 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+p {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 0.875rem;
+  }
+}
+</style>

@@ -25,3 +25,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@media (max-width: 768px) {
+  p {
+    font-size: 0.875rem;
+  }
+}
+</style>

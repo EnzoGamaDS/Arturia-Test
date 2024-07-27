@@ -99,4 +99,20 @@ th {
 tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
+@media (max-width: 768px) {
+  .input {
+    font-size: 0.875rem;
+  }
+  .button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  table {
+    font-size: 0.875rem;
+  }
+  th, td {
+    padding: 0.25rem;
+  }
+}
 </style>

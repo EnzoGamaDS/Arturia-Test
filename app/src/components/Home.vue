@@ -59,4 +59,29 @@ export default {
 .button:hover {
   background-color: #e7e7e7;
 }
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+  .text-5xl {
+    font-size: 2.25rem;
+  }
+  .text-4xl {
+    font-size: 2rem;
+  }
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  .mt-4 {
+    margin-top: 1rem;
+  }
+  .mt-8 {
+    margin-top: 2rem;
+  }
+  .button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
 </style>

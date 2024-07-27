@@ -9,7 +9,10 @@
       <p>Quantidade: {{ produto.quantidade }}</p>
       <button @click="removeFromCart(produto.id)" class="button">Remover</button>
     </div>
-    <button @click="finalizarPedido" class="button">Finalizar Pedido</button>
+    <div class="text-right">
+      <h2 class="text-2xl font-bold">Total: R$ {{ total.toFixed(2) }}</h2>
+    </div>
+    <button @click="finalizarPedido" class="button mt-4">Finalizar Pedido</button>
   </div>
 </template>
 
@@ -27,6 +30,13 @@ export default {
       this.carrinho = await getCarrinho();
     } catch (error) {
       console.error('Erro ao buscar carrinho:', error);
+    }
+  },
+  computed: {
+    total() {
+      return this.carrinho.reduce((acc, produto) => {
+        return acc + (produto.preco * produto.quantidade);
+      }, 0);
     }
   },
   methods: {
@@ -65,5 +75,13 @@ export default {
 
 .button:hover {
   background-color: #165db1;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.text-right {
+  text-align: right;
 }
 </style>

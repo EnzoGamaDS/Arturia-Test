@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <header class="bg-blue-600 text-white py-4 shadow-lg">
-      <div class="container mx-auto flex justify-between items-center">
+      <div class="container mx-auto flex justify-between items-center px-4">
         <router-link to="/" class="text-3xl font-semibold hover:text-gray-300">Arturia E-commerce</router-link>
         <nav class="flex items-center space-x-4">
           <router-link to="/usuarios" class="flex items-center space-x-2 text-white hover:text-gray-300">
@@ -23,7 +23,7 @@
         </nav>
       </div>
     </header>
-    <main class="container mx-auto flex-grow py-8">
+    <main class="container mx-auto flex-grow py-8 px-4">
       <router-view />
     </main>
     <footer class="bg-blue-600 text-white py-4 text-center shadow-lg">
@@ -49,6 +49,9 @@
           <button @click="removeFromCart(index)" class="remove-button">Remover</button>
         </li>
       </ul>
+      <div class="text-right font-semibold mt-4">
+        <p>Total: R$ {{ total.toFixed(2) }}</p>
+      </div>
       <button @click="clearCart" class="clear-cart-button">
         Limpar Carrinho
       </button>
@@ -69,6 +72,13 @@ export default {
       showCart: false,
       cart: JSON.parse(localStorage.getItem('cart')) || []
     };
+  },
+  computed: {
+    total() {
+      return this.cart.reduce((acc, item) => {
+        return acc + (item.preco * item.quantidade);
+      }, 0);
+    }
   },
   watch: {
     cart: {
@@ -298,5 +308,18 @@ nav a:hover {
 
 .cart-button:hover {
   color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+  .flex.items-center.space-x-4 {
+    flex-direction: column;
+    align-items: flex-start;
+    space-y-4: 1rem;
+    space-x-0: 0;
+  }
+  .flex.justify-between.items-center {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>
