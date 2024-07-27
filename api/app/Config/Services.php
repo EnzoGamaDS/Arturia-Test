@@ -4,7 +4,11 @@ namespace Config;
 
 use CodeIgniter\Config\BaseService;
 use App\Services\UsuarioService;
+use App\Services\ProdutoService;
+use App\Services\PedidoService;
 use App\Repositories\UsuarioRepository;
+use App\Repositories\ProdutoRepository;
+use App\Repositories\PedidoRepository;
 
 class Services extends BaseService
 {
@@ -15,5 +19,14 @@ class Services extends BaseService
         }
 
         return new UsuarioService(new UsuarioRepository());
+    }
+
+    public static function produtoService($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('produtoService');
+        }
+
+        return new ProdutoService(new ProdutoRepository(new \App\Models\ProdutoModel()));
     }
 }
