@@ -16,7 +16,7 @@
       <tbody>
         <tr v-for="usuario in usuarios" :key="usuario.id">
           <td class="border px-4 py-2">
-            <router-link :to="`/usuarios/${usuario.id}`">{{ usuario.nome }}</router-link>
+            <p>{{ usuario.nome }}</p>
           </td>
           <td class="border px-4 py-2">{{ usuario.email }}</td>
         </tr>
